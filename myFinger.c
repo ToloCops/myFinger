@@ -99,35 +99,41 @@ void print_centered(const char* text, int width) {
     }
 }
 
-void print_user_info_row(const UserInfo* user) {
+void print_user_info(const UserInfo* user, char mode) {
     // Calcola ore e minuti dall'idle time
     int hours = user->idle_time / 3600;
     int minutes = (user->idle_time % 3600) / 60;
 
-    // Stampa le informazioni dell'utente con formato centrato
-    printf("| ");
-    print_centered(user->username, 15);
-    printf("| ");
-    print_centered(user->real_name, 15);
-    printf("| ");
-    print_centered(user->tty, 10);
-    printf("| ");
-    printf("   %02d:%02d   | ", hours, minutes);
-    print_centered(user->formatted_login_time, 20);
-    printf("|\n");
+    if (mode == 's') {
+        // Stampa le informazioni in formato tabellare
+        printf("| ");
+        print_centered(user->username, 15);
+        printf("| ");
+        print_centered(user->real_name, 15);
+        printf("| ");
+        print_centered(user->tty, 10);
+        printf("| ");
+        printf("   %02d:%02d   | ", hours, minutes);
+        print_centered(user->formatted_login_time, 20);
+        printf("|\n");
+    } else if (mode == 'l') {
+        // Stampa le informazioni in formato dettagliato
+        printf("Username: %s\n", user->username);
+        printf("Real Name: %s\n", user->real_name);
+        printf("Home Dir: %s\n", user->home_dir);
+        printf("Shell: %s\n", user->shell);
+        printf("Tty: %s\n", user->tty);
+        printf("Idle Time: %02d:%02d\n", hours, minutes);
+        printf("Login Time: %s\n", user->formatted_login_time);
+    } else {
+        fprintf(stderr, "Modalità non valida: usa 's' o 'l'.\n");
+    }
 }
 
-void print_user_info(const UserInfo* user) {
-    printf("Username: %s\n", user->username);
-    printf("Real Name: %s\n", user->real_name);
-    printf("Home Dir: %s\n", user->home_dir);
-    printf("Shell: %s\n", user->shell);
-    printf("Tty: %s\n", user->tty);
-    printf("Idle Time: %ld seconds\n", user->idle_time);
-    printf("Login Time: %s\n", user->formatted_login_time);
-}
-
-void get_all_logged_users() {
+void print_all_logged_users(char mode) {
+    if (mode == 's') {
+        print_table_header();
+    }
     struct utmp* u;
     char printed_users[MAX_USERS][32]; // Array per memorizzare i nomi degli utenti stampati
     int user_count = 0;
@@ -149,7 +155,7 @@ void get_all_logged_users() {
             // Se non è stato stampato, aggiungilo e stampa le informazioni
             if (!already_printed) {
                 UserInfo user = get_user_info(u->ut_user);
-                print_user_info_row(&user);
+                print_user_info(&user, mode);
                 printf("\n"); // Separatore tra utenti
 
                 // Aggiungi l'utente all'array di utenti stampati

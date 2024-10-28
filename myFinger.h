@@ -20,7 +20,7 @@ typedef struct {
 
 void print_table_header();
 
-void get_all_logged_users();
+void print_all_logged_users(char mode);
 
 void print_centered(const char* text, int width);
 
@@ -28,8 +28,6 @@ time_t get_idle_time(const char* tty);
 
 UserInfo get_user_info(char *username);
 
-void print_user_info_row(const UserInfo* user);
-
-void print_user_info(const UserInfo* user);
+void print_user_info(const UserInfo* user, char mode);
 
 #endif
