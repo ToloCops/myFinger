@@ -50,12 +50,16 @@ int main(int argc, char *argv[])
     } else if (s_flag) {
         if (username) {
             UserInfo user = get_user_info(username);
+            print_table_header();
             print_user_info(&user, 's');
         } else {
             print_all_logged_users('s');
         }
     } else if (username) {
-        printf("Nome utente specificato: %s\n", username);
+        UserInfo user = get_user_info(username);
+        print_user_info(&user, 'l');
+    } else {
+        print_all_logged_users('s');
     }
 
     return 0;
