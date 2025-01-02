@@ -7,9 +7,9 @@
 void print_table_header()
 {
     printf("| ");
-    print_centered("Username", 15);
+    print_centered("Login", 15);
     printf("| ");
-    print_centered("Real Name", 15);
+    print_centered("Name", 15);
     printf("| ");
     print_centered("Tty", 10);
     printf("| ");
@@ -84,7 +84,7 @@ UserInfo get_user_info(struct utmp *user)
     info.last_login_time = user->ut_time;
 
     struct tm *tm_info = localtime(&info.login_time);
-    strftime(info.formatted_login_time, sizeof(info.formatted_login_time), "%Y-%m-%d %H:%M:%S", tm_info);
+    strftime(info.formatted_login_time, sizeof(info.formatted_login_time), "%Y-%m-%d %H:%M", tm_info);
 
     return info;
 }
@@ -144,8 +144,8 @@ void print_user_info(const UserInfo *user, char mode)
     else if (mode == 'l')
     {
         // Stampa le informazioni in formato dettagliato
-        printf("Username: %s\n", user->username);
-        printf("Real Name: %s\n", user->real_name);
+        printf("Login: %s\n", user->username);
+        printf("Name: %s\n", user->real_name);
         printf("Home Dir: %s\n", user->home_dir);
         printf("Shell: %s\n", user->shell);
         printf("Tty: %s\n", user->tty);
@@ -165,8 +165,6 @@ void print_all_logged_users(char mode)
         print_table_header();
     }
     struct utmp *u;
-    char printed_users[MAX_USERS][32]; // Array per memorizzare i nomi degli utenti stampati
-    int user_count = 0;
 
     setutent(); // Riporta il puntatore al primo record
 
@@ -174,32 +172,9 @@ void print_all_logged_users(char mode)
     {
         if (u->ut_type == USER_PROCESS)
         {
-            int already_printed = 0;
-
-            // Verifica se l'utente è già stato stampato
-            for (int i = 0; i < user_count; i++)
-            {
-                if (strcmp(printed_users[i], u->ut_user) == 0)
-                {
-                    already_printed = 1;
-                    break;
-                }
-            }
-
-            // Se non è stato stampato, aggiungilo e stampa le informazioni
-            if (!already_printed)
-            {
-                UserInfo user = get_user_info(u);
-                print_user_info(&user, mode);
-                printf("\n"); // Separatore tra utenti
-
-                // Aggiungi l'utente all'array di utenti stampati
-                if (user_count < MAX_USERS)
-                {
-                    strncpy(printed_users[user_count], u->ut_user, sizeof(printed_users[user_count]) - 1);
-                    user_count++;
-                }
-            }
+            UserInfo user = get_user_info(u);
+            print_user_info(&user, mode);
+            printf("\n"); // Separatore tra utenti
         }
     }
 
