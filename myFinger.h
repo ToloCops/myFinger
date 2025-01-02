@@ -6,7 +6,8 @@
 #include <time.h>
 #include <sys/stat.h>
 
-typedef struct {
+typedef struct
+{
     char username[32];
     char real_name[128];
     char home_dir[256];
@@ -22,12 +23,14 @@ void print_table_header();
 
 void print_all_logged_users(char mode);
 
-void print_centered(const char* text, int width);
+void print_centered(const char *text, int width);
 
-time_t get_idle_time(const char* tty);
+time_t get_idle_time(const char *tty);
 
-UserInfo get_user_info(char *username);
+struct utmp *get_user_utmp(const char *username);
 
-void print_user_info(const UserInfo* user, char mode);
+UserInfo get_user_info(struct utmp *user);
+
+void print_user_info(const UserInfo *user, char mode);
 
 #endif
