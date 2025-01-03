@@ -84,7 +84,8 @@ UserInfo get_user_info(struct utmp *user)
     info.last_login_time = user->ut_time;
 
     struct tm *tm_info = localtime(&info.login_time);
-    strftime(info.formatted_login_time, sizeof(info.formatted_login_time), "%Y-%m-%d %H:%M", tm_info);
+    strftime(info.shortf_log_time, sizeof(info.shortf_log_time), "%b %d %H:%M", tm_info);
+    strftime(info.longf_log_time, sizeof(info.longf_log_time), "%a %b %d %H:%M (%Z)", tm_info);
 
     return info;
 }
@@ -123,9 +124,12 @@ void print_centered(const char *text, int width)
 
 void print_user_info(const UserInfo *user, char mode)
 {
+    static UserInfo last_user;
+
     // Calcola ore e minuti dall'idle time
     int hours = user->idle_time / 3600;
     int minutes = (user->idle_time % 3600) / 60;
+    int seconds = user->idle_time % 60;
 
     if (mode == 's')
     {
@@ -137,20 +141,25 @@ void print_user_info(const UserInfo *user, char mode)
         printf("| ");
         print_centered(user->tty, 10);
         printf("| ");
-        printf("   %02d:%02d   | ", hours, minutes);
-        print_centered(user->formatted_login_time, 20);
+        printf("   %02d   | ", minutes);
+        print_centered(user->shortf_log_time, 20);
         printf("|\n");
     }
     else if (mode == 'l')
     {
-        // Stampa le informazioni in formato dettagliato
-        printf("Login: %s\n", user->username);
-        printf("Name: %s\n", user->real_name);
-        printf("Home Dir: %s\n", user->home_dir);
-        printf("Shell: %s\n", user->shell);
-        printf("Tty: %s\n", user->tty);
-        printf("Idle Time: %02d:%02d\n", hours, minutes);
-        printf("Login Time: %s\n", user->formatted_login_time);
+        if (strcmp(last_user.username, user->username) != 0)
+        {
+            printf("Login: %s\n", user->username);
+            printf("Name: %s\n", user->real_name);
+            printf("Home Dir: %s\n", user->home_dir);
+            printf("Shell: %s\n", user->shell);
+        }
+
+        printf("On since %s on ", user->longf_log_time);
+        printf("%s\n", user->tty);
+        printf("   %02d minutes %02d seconds idle\n", minutes, seconds);
+
+        last_user = *user;
     }
     else
     {

@@ -16,7 +16,8 @@ typedef struct
     char tty[32];
     time_t idle_time;
     time_t last_login_time;
-    char formatted_login_time[20];
+    char shortf_log_time[20]; // Formato: "Jan 3 16:01"
+    char longf_log_time[40];  // Formato: "Fri Jan 3 16:01 (CET)"
 } UserInfo;
 
 void print_table_header();
